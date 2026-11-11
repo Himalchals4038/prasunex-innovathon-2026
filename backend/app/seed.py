@@ -54,10 +54,10 @@ def seed_database(db: Session | None = None):
         for college, student_count in colleges:
             college_users = []
             demo_roles = [
-                ("admin", "admin", "Ananya Malhotra", "chancellor_dean"),
-                ("professor", "professor", "Dr. Rohan Iyer", "professor_hod"),
-                ("technician", "technician", "Kiran Patel", "technician_warden"),
-                ("recruiter", "recruiter", "Neha Kapoor", "recruiter"),
+                ("admin", "admin", "Campus Administrator", "chancellor_dean"),
+                ("professor", "professor", "Professor Demo", "professor_hod"),
+                ("technician", "technician", "Facilities Technician", "technician_warden"),
+                ("recruiter", "recruiter", "Recruiter Demo", "recruiter"),
             ]
             for local_id, (username, password, full_name, role) in enumerate(demo_roles, start=1):
                 user = User(
@@ -96,6 +96,7 @@ def seed_database(db: Session | None = None):
                     co_po_config_json=json.dumps({"CO1": ["PO1", "PO2"], "CO2": ["PO1", "PO3"], "CO3": ["PO2", "PO4"]}),
                 )
                 db.add(course)
+                db.flush()
                 concepts = [
                     ("C1", "Core foundations", []),
                     ("C2", "Applied problem solving", ["C1"]),

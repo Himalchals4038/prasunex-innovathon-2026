@@ -114,6 +114,21 @@ class KnowledgeState(Base):
     updated_at = Column(DateTime(timezone=True), default=utcnow)
 
 
+class StudyPlanItem(Base):
+    __tablename__ = "study_plan_items"
+
+    id = Column(String(64), primary_key=True)
+    tenant_id = Column(String(64), ForeignKey("colleges.id"), nullable=False, index=True)
+    student_id = Column(String(64), ForeignKey("users.id"), nullable=False, index=True)
+    course_id = Column(String(64), ForeignKey("courses.id"), nullable=False, index=True)
+    concept_code = Column(String(40), nullable=False)
+    scheduled_date = Column(String(10), nullable=False, index=True)
+    duration_minutes = Column(Integer, nullable=False, default=25)
+    activity = Column(String(240), nullable=False)
+    completed = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+
 class AttendanceRecord(Base):
     __tablename__ = "attendance_records"
 

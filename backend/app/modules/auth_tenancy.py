@@ -71,9 +71,9 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 @router.post("/auth/register")
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
-    allowed_roles = {"chancellor_dean", "professor_hod", "student", "technician_warden", "recruiter"}
-    if payload.role not in allowed_roles:
-        raise HTTPException(status_code=400, detail="Unsupported role")
+    # Public registration must never grant a privileged campus role.
+    if payload.role != "student":
+        raise HTTPException(status_code=403, detail="Public registration is limited to student accounts")
     college = db.query(College).filter(College.code == payload.college_code.strip().upper()).first()
     if not college:
         raise HTTPException(status_code=404, detail="College code not found")

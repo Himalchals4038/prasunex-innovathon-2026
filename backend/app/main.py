@@ -18,6 +18,7 @@ from .modules.accreditation import router as accreditation_router
 from .modules.facilities import router as facilities_router
 from .modules.network import router as network_router
 from .modules.privacy import router as privacy_router
+from .modules.study import router as study_router
 from .models import AttendanceRecord, College, Course, KnowledgeState, MaintenanceTicket, User
 from .security import get_current_user
 from .database import get_db
@@ -49,6 +50,7 @@ app.include_router(accreditation_router)
 app.include_router(facilities_router)
 app.include_router(network_router)
 app.include_router(privacy_router)
+app.include_router(study_router)
 
 
 @app.get("/health")
