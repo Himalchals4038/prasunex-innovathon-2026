@@ -2,6 +2,8 @@
 
 From a mark to a decision. A local-first campus intelligence demo for Prasunex Innovathon 2026.
 
+Vanshika Yadav | Himadri Mondal
+
 ## Run locally
 
 Requirements: Python 3.11+, Node.js 18+, npm. PostgreSQL and Redis are optional for the local demo; the API uses SQLite by default.
@@ -26,13 +28,13 @@ Open http://localhost:3000. API health: http://localhost:8000/health. On first A
 
 Choose a role on the sign-in screen; credentials are prefilled for Northstar Institute (`NITX`).
 
-| Role | Email | Password |
-|---|---|---|
-| Administrator | `admin@nitx.demo` | `admin` |
-| Professor | `professor@nitx.demo` | `professor` |
-| Student | `student001@nitx.demo` | `student123` |
-| Technician | `technician@nitx.demo` | `technician` |
-| Recruiter | `recruiter@nitx.demo` | `recruiter` |
+| Role          | Email                    | Password       |
+| ------------- | ------------------------ | -------------- |
+| Administrator | `admin@nitx.demo`      | `admin`      |
+| Professor     | `professor@nitx.demo`  | `professor`  |
+| Student       | `student001@nitx.demo` | `student123` |
+| Technician    | `technician@nitx.demo` | `technician` |
+| Recruiter     | `recruiter@nitx.demo`  | `recruiter`  |
 
 The same demo identities are available for `RBCE` by replacing `nitx` in the email. These credentials and the default JWT secret are for local demonstration only.
 
