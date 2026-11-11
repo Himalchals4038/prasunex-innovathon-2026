@@ -42,6 +42,18 @@ def seed_database(db: Session | None = None):
     db = db or SessionLocal()
     try:
         if db.query(College).first():
+            demo_profiles = {
+                "admin@nitx.demo": "Campus Administrator",
+                "professor@nitx.demo": "Professor Demo",
+                "technician@nitx.demo": "Facilities Technician",
+                "recruiter@nitx.demo": "Recruiter Demo",
+                "student001@nitx.demo": "Student Demo",
+            }
+            for email, display_name in demo_profiles.items():
+                profile = db.query(User).filter(User.email == email).first()
+                if profile:
+                    profile.full_name = display_name
+            db.commit()
             return
 
         colleges = []
@@ -78,7 +90,7 @@ def seed_database(db: Session | None = None):
                     id=f"{college.id}-student-{index+1:03d}", tenant_id=college.id,
                     email=f"student{index+1:03d}@{college.code.lower()}.demo",
                     hashed_password=hash_password("student123"),
-                    full_name=f"{first_names[index % 10]} {last_names[(index * 3) % 10]}",
+                    full_name="Student Demo" if college.code == "NITX" and index == 0 else f"{first_names[index % 10]} {last_names[(index * 3) % 10]}",
                     role="student", department=department, semester=5,
                     cgpa=round(6.1 + ((index * 17) % 39) / 10, 2),
                     karma_points=(index * 13) % 120,

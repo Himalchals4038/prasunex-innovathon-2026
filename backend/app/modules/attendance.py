@@ -1,9 +1,11 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models import AttendanceRecord, Course, KnowledgeState, User
+from ..models import AttendanceRecord, ConceptNode, Course, KnowledgeState, User
 from ..security import get_current_user, require_roles
 
 router = APIRouter(prefix="/api", tags=["Attendance & Learning"])
@@ -68,12 +70,16 @@ def my_knowledge(user: User = Depends(get_current_user), db: Session = Depends(g
     rows = db.query(KnowledgeState, Course).join(
         Course, (Course.id == KnowledgeState.course_id) & (Course.tenant_id == KnowledgeState.tenant_id)
     ).filter(KnowledgeState.tenant_id == user.tenant_id, KnowledgeState.student_id == user.id).all()
-    return [
-        {"course_id": course.id, "course_code": course.code, "course_title": course.title,
-         "concept_code": state.concept_code, "mastery": round(state.bkt_mastery, 3),
-         "attempts": state.attempts, "correct_count": state.correct_count}
-        for state, course in rows
-    ]
+    result = []
+    for state, course in rows:
+        nodes = db.query(ConceptNode).filter(ConceptNode.tenant_id == user.tenant_id,
+            ConceptNode.course_id == course.id).all()
+        node = next((item for item in nodes if item.concept_code == state.concept_code), None)
+        prerequisites = json.loads(node.prereq_codes_json or "[]") if node else []
+        result.append({"course_id": course.id, "course_code": course.code, "course_title": course.title,
+            "concept_code": state.concept_code, "mastery": round(state.bkt_mastery, 3),
+            "prerequisites": prerequisites, "attempts": state.attempts, "correct_count": state.correct_count})
+    return result
 
 
 @router.post("/knowledge/attempts")

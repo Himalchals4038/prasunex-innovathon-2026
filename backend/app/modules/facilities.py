@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..config import settings
@@ -15,6 +16,10 @@ from ml.inference import classify_defect_image, cosine_similarity, embed_text
 router = APIRouter(prefix="/api/facilities", tags=["Facilities & Maintenance"])
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
+
+class MergeRequest(BaseModel):
+    candidate_id: str
 
 
 def _audit(ticket: MaintenanceTicket, event: str, actor_id: str, note: str = ""):
@@ -29,14 +34,26 @@ def list_tickets(status: str | None = None, user: User = Depends(get_current_use
     if status:
         query = query.filter(MaintenanceTicket.status == status)
     tickets = query.order_by(MaintenanceTicket.created_at.desc()).all()
-    return [
+    result = []
+    for t in tickets:
+        audit = json.loads(t.audit_ledger_json or "[]")
+        suggestion = next((entry for entry in reversed(audit) if entry.get("event") == "duplicate_suggested"), None)
+        candidate_id = None
+        similarity = None
+        if suggestion:
+            try:
+                candidate = json.loads(suggestion.get("note", "{}"))
+                candidate_id, similarity = candidate.get("candidate_id"), candidate.get("similarity")
+            except (TypeError, ValueError):
+                pass
+        result.append(
         {"id": t.id, "title": t.title, "description": t.description, "location": t.location,
          "category": t.vision_category, "confidence": t.vision_confidence, "priority": t.priority,
          "status": t.status, "sla_deadline": t.sla_deadline.isoformat(), "merged_count": t.merged_count,
+         "merged_into_id": t.merged_into_id, "potential_duplicate_id": candidate_id, "similarity": similarity,
          "photo_url": f"/api/facilities/photos/{os.path.basename(t.photo_path)}" if t.photo_path else None,
-         "audit": json.loads(t.audit_ledger_json or "[]")}
-        for t in tickets
-    ]
+         "audit": audit})
+    return result
 
 
 @router.post("/tickets", status_code=201)
@@ -75,10 +92,13 @@ async def create_ticket(
         MaintenanceTicket.merged_into_id.is_(None),
     ).all()
     duplicate = None
+    duplicate_similarity = None
     for existing in open_tickets:
         existing_vec = json.loads(existing.embedding_json or "[]")
-        if existing_vec and cosine_similarity(vector, existing_vec) >= 0.82:
+        similarity = cosine_similarity(vector, existing_vec) if existing_vec else 0
+        if similarity >= 0.82:
             duplicate = existing
+            duplicate_similarity = similarity
             break
 
     ticket_id = f"ticket-{uuid.uuid4().hex[:12]}"
@@ -88,20 +108,42 @@ async def create_ticket(
         title=title.strip()[:200], description=description.strip(), location=location.strip()[:160],
         photo_path=saved_photo, vision_category=category, vision_confidence=confidence,
         embedding_json=json.dumps(vector), priority=priority, status="Open",
-        sla_deadline=sla, merged_into_id=duplicate.id if duplicate else None,
+        sla_deadline=sla,
     )
     _audit(ticket, "created", user.id, f"category={category}; confidence={confidence}")
+    if duplicate:
+        _audit(ticket, "duplicate_suggested", user.id, json.dumps({"candidate_id": duplicate.id, "similarity": round(duplicate_similarity or 0, 3)}))
     db.add(ticket)
     if duplicate:
-        duplicate.merged_count += 1
-        _audit(duplicate, "duplicate_merged", user.id, f"merged ticket {ticket_id} (similarity >= 0.82)")
+        # Similarity is a human-review suggestion. Do not merge or hide a report automatically.
+        pass
     else:
         technician = db.query(User).filter(User.tenant_id == user.tenant_id, User.role == "technician_warden").first()
         if technician:
             ticket.assigned_to_id = technician.id
             _audit(ticket, "auto_dispatched", technician.id, category)
     db.commit()
-    return {"id": ticket.id, "category": category, "confidence": confidence, "merged_into": ticket.merged_into_id, "sla_deadline": sla.isoformat(), "status": ticket.status}
+    return {"id": ticket.id, "category": category, "confidence": confidence,
+            "potential_duplicate_id": duplicate.id if duplicate else None,
+            "similarity": round(duplicate_similarity, 3) if duplicate_similarity is not None else None,
+            "sla_deadline": sla.isoformat(), "status": ticket.status}
+
+
+@router.post("/tickets/{ticket_id}/merge")
+def confirm_duplicate_merge(ticket_id: str, payload: MergeRequest,
+    user: User = Depends(require_roles(["technician_warden", "chancellor_dean"])), db: Session = Depends(get_db)):
+    ticket = db.query(MaintenanceTicket).filter(MaintenanceTicket.id == ticket_id, MaintenanceTicket.tenant_id == user.tenant_id).first()
+    candidate = db.query(MaintenanceTicket).filter(MaintenanceTicket.id == payload.candidate_id, MaintenanceTicket.tenant_id == user.tenant_id).first()
+    if not ticket or not candidate or ticket.id == candidate.id:
+        raise HTTPException(status_code=404, detail="Ticket or duplicate candidate not found")
+    if ticket.merged_into_id:
+        raise HTTPException(status_code=409, detail="This ticket has already been merged")
+    ticket.merged_into_id = candidate.id
+    candidate.merged_count += 1
+    _audit(ticket, "duplicate_merge_confirmed", user.id, f"merged_into={candidate.id}")
+    _audit(candidate, "duplicate_received", user.id, f"ticket={ticket.id}")
+    db.commit()
+    return {"id": ticket.id, "merged_into_id": candidate.id, "merged_count": candidate.merged_count}
 
 
 @router.patch("/tickets/{ticket_id}")
