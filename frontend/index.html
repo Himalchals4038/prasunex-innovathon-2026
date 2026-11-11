@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAMPUS-NEXUS | Prasunex Innovathon 2026</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #041d18;
+            --green: #087f65;
+            --mint: #50dda9;
+            --gold: #e9bb62;
+            --white: #f4f8f3;
+            --muted: #a8c4b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #020e0b;
+            display: grid;
+            place-items: center;
+            font-family: 'Manrope', sans-serif;
+            color: var(--white);
+            padding: 25px;
+        }
+
+        .cover {
+            width: min(100%, 1440px);
+            aspect-ratio: 16 / 9;
+            min-height: 620px;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse at 78% 40%, #087f654d, transparent 40%),
+                radial-gradient(ellipse at 15% 90%, #087f6530, transparent 35%),
+                linear-gradient(120deg, #041d18, #082d24 65%, #041a15);
+            border: 1px solid #50dda944;
+            border-radius: 20px;
+            box-shadow: 0 30px 100px #0009;
+            padding: 5%;
+        }
+
+        /* Background graphics */
+
+        .orbit {
+            position: absolute;
+            width: 650px;
+            height: 650px;
+            border: 1px solid #50dda91c;
+            border-radius: 50%;
+            right: -100px;
+            top: -100px;
+            animation: rotate 35s linear infinite;
+        }
+
+        .orbit.two {
+            width: 500px;
+            height: 500px;
+            right: -25px;
+            top: -25px;
+            border-style: dashed;
+            animation-direction: reverse;
+        }
+
+        @keyframes rotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: #36dba0;
+            filter: blur(180px);
+            opacity: .12;
+            right: 15%;
+            top: 20%;
+        }
+
+        /* Header */
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 3;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            border: 1px solid var(--mint);
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 26px;
+            color: var(--mint);
+            background: #50dda912;
+            box-shadow: 0 0 25px #50dda922;
+        }
+
+        .brand-name {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--mint);
+        }
+
+        .event {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* Main layout */
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1.05fr;
+            gap: 25px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            height: 72%;
+            margin-top: 25px;
+        }
+
+        .eyebrow {
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: clamp(44px, 5.4vw, 76px);
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: -4px;
+        }
+
+        h1 span {
+            color: var(--mint);
+        }
+
+        .tagline {
+            font-size: clamp(19px, 2vw, 27px);
+            font-weight: 700;
+            color: var(--gold);
+            margin-top: 22px;
+        }
+
+        .description {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.9;
+            margin-top: 15px;
+            max-width: 460px;
+        }
+
+        .chips {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            border: 1px solid #50dda955;
+            background: #50dda910;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-size: 10px;
+            color: var(--mint);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* AI campus visual */
+
+        .visual {
+            position: relative;
+            height: 390px;
+            display: grid;
+            place-items: center;
+        }
+
+        .ai-core {
+            position: absolute;
+            z-index: 4;
+            width: 125px;
+            height: 125px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #126f55, #041d18);
+            border: 2px solid var(--mint);
+            box-shadow: 0 0 30px #50dda966, inset 0 0 30px #50dda922;
+            display: grid;
+            place-items: center;
+            font-size: 43px;
+            font-weight: 800;
+            color: var(--mint);
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            50% {
+                box-shadow: 0 0 65px #50dda988, inset 0 0 30px #50dda933;
+            }
+        }
+
+        .campus {
+            position: absolute;
+            bottom: 28px;
+            display: flex;
+            align-items: end;
+            gap: 12px;
+            z-index: 2;
+        }
+
+        .building {
+            width: 105px;
+            height: 165px;
+            background: linear-gradient(145deg, #17664f, #08271f);
+            border: 1px solid #50dda977;
+            box-shadow: 0 0 25px #50dda922;
+            padding: 15px 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 9px;
+        }
+
+        .building:nth-child(2) {
+            width: 135px;
+            height: 225px;
+        }
+
+        .building:nth-child(3) {
+            height: 145px;
+        }
+
+        .window {
+            background: #e9bb62;
+            box-shadow: 0 0 10px #e9bb6277;
+            height: 13px;
+            animation: blink 3s infinite alternate;
+        }
+
+        @keyframes blink {
+            to {
+                opacity: .45;
+            }
+        }
+
+        .network {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border: 1px dashed #50dda955;
+            border-radius: 50%;
+            transform: rotate(-20deg);
+        }
+
+        .node {
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            background: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 18px var(--gold);
+        }
+
+        .node.one {
+            top: 8%;
+            left: 20%;
+        }
+
+        .node.two {
+            top: 15%;
+            right: 8%;
+        }
+
+        .node.three {
+            bottom: 25%;
+            left: 5%;
+        }
+
+        .node.four {
+            bottom: 12%;
+            right: 18%;
+        }
+
+        /* Footer */
+
+        .footer {
+            position: absolute;
+            bottom: 4%;
+            left: 5%;
+            right: 5%;
+            border-top: 1px solid #50dda944;
+            padding-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 3;
+            gap: 20px;
+        }
+
+        .team-label {
+            font-size: 10px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .team {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 7px;
+            line-height: 1.7;
+        }
+
+        .footer-mark {
+            color: var(--mint);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        @media(max-width: 850px) {
+            body {
+                padding: 10px;
+            }
+
+            .cover {
+                aspect-ratio: auto;
+                min-height: 100vh;
+                border-radius: 12px;
+                padding: 28px 22px 150px;
+            }
+
+            .main {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .visual {
+                height: 330px;
+            }
+
+            .footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            h1 {
+                letter-spacing: -2px;
+            }
+
+            .event {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="cover">
+
+        <div class="orbit"></div>
+        <div class="orbit two"></div>
+        <div class="glow"></div>
+
+        <header class="header">
+            <div class="brand">
+                <div class="logo">✧</div>
+                <div class="brand-name">CAMPUS-NEXUS</div>
+            </div>
+            <div class="event">PRASUNEX INNOVATHON 2026</div>
+        </header>
+
+        <main class="main">
+
+            <section class="content">
+
+                <div class="eyebrow">
+                    THE CONNECTED CAMPUS INTELLIGENCE LAYER
+                </div>
+
+                <h1>
+                    CAMPUS-<br>
+                    <span>NEXUS</span>
+                </h1>
+
+                <div class="tagline">
+                    From a mark to a decision.
+                </div>
+
+                <p class="description">
+                    Turning every mark, ticket and schedule into
+                    clearer academic and campus decisions through
+                    one connected AI-powered ecosystem.
+                </p>
+
+                <div class="chips">
+                    <div class="chip">15 AI MODULES</div>
+                    <div class="chip">3 ROLE-BASED PORTALS</div>
+                    <div class="chip">SMART CAMPUS</div>
+                </div>
+
+            </section>
+
+            <section class="visual">
+
+                <div class="network"></div>
+
+                <div class="node one"></div>
+                <div class="node two"></div>
+                <div class="node three"></div>
+                <div class="node four"></div>
+
+                <div class="ai-core">AI</div>
+
+                <div class="campus">
+                    <div class="building">
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                    </div>
+
+                    <div class="building">
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                    </div>
+
+                    <div class="building">
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                        <div class="window"></div>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+
+        <footer class="footer">
+
+            <div>
+                <div class="team-label">PRESENTED BY</div>
+                <div class="team">
+                    Himadri Mondal · Nandini Singh · Vanshika Yadav<br>
+                    Anvesha Saraswat · Niranjana A R
+                </div>
+            </div>
+
+            <div class="footer-mark">
+                ONE CAMPUS. ONE INTELLIGENCE. BETTER DECISIONS.
+            </div>
+
+        </footer>
+
+    </section>
+
+</body>
+
+</html>
